@@ -1,0 +1,74 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+	font-family: 'Montserrat', serif;
+	font-optical-sizing: auto;
+	font-style: normal;
+}
+
+body {
+	max-width: 1440px;
+	margin-inline: auto;
+}
+
+svg {
+	pointer-events: none;
+}
+
+.hero {
+	// padding-block-start: 2rem;
+	display: grid;
+	align-items: center;
+	grid-template-columns: repeat(5, 1fr);
+
+	.titles {
+		flex: 1;
+		padding-block: 6.25rem;
+		display: flex;
+		flex-direction: column;
+		gap: 20px;
+		grid-column: 1 / 4;
+		grid-row: 1 / 1;
+		z-index: 2;
+
+		.small {
+			font-size: 1rem;
+			font-weight: 500;
+			line-height: 26px;
+			letter-spacing: 6px;
+			color: hsla(208, 50%, 43%, 1);
+		}
+
+		h1 {
+			--fz: clamp(2rem, 5vw, 3rem);
+			font-size: var(--fz);
+			line-height: calc(var(--fz) + 10px);
+			font-weight: 700;
+			color: hsla(216, 48%, 33%, 1);
+			max-width: 23ch;
+		}
+	}
+
+	#map-container {
+		flex: 1;
+		grid-column: 3 / -1;
+		grid-row: 1 / 1;
+		position: relative;
+
+		&::before {
+			content: '';
+			position: absolute;
+			height: 100%;
+			left: 0;
+			width: 50%;
+			background: linear-gradient(to right, #fff, rgba(255, 255, 255, 0));
+		}
+
+		svg {
+			// height: 20rem;
+		}
+	}
+}
