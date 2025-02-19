@@ -1,7 +1,11 @@
-import './style.scss'
-import 'swiper/css'
-
 import * as d3 from 'd3'
+import { ArrowRight, ChevronLeft, ChevronRight, createIcons } from 'lucide'
+import Swiper from 'swiper'
+// import Navigation from 'swiper/modules/navigation'
+import 'swiper/css'
+import 'swiper/css/navigation'
+
+import './style.scss'
 
 async function chart() {
 	const width = 975
@@ -9,6 +13,7 @@ async function chart() {
 	let currentCity = 0
 
 	const us = await d3.json('https://d3js.org/us-10m.v2.json') // ? loading the map asset
+	// const us = await d3.json('./countries-110m.json') // ? loading the map asset
 
 	// ? helpful to plot the points
 	const projection = d3
@@ -21,7 +26,7 @@ async function chart() {
 		.zoom()
 		.scaleExtent([2, 2])
 		.translateExtent([
-			[0, 0],
+			[2, 2],
 			[width, height],
 		])
 		.on('zoom', (e) => {
@@ -33,8 +38,8 @@ async function chart() {
 	const svg = d3
 		.create('svg')
 		.attr('viewBox', [0, 0, width, height])
-		.attr('width', width)
-		.attr('height', height)
+		.attr('width', '100%')
+		.attr('height', '100%')
 		.attr('style', 'max-width: 100%;')
 	// .on('click', reset)
 
@@ -66,23 +71,41 @@ async function chart() {
 	// 	.attr('stroke-linejoin', 'round')
 	// 	.attr('d', path(topojson.mesh(us, us.objects.states, (a, b) => a !== b)))
 
-	const cities = [
-		{ name: 'New York', coords: [-74.006, 40.7128] },
-		{ name: 'Los Angeles', coords: [-118.2437, 34.0522] },
-		{ name: 'Chicago', coords: [-87.6298, 41.8781] },
-	]
+	// const cities = [
+	// 	{ name: 'New York', coords: [-74.006, 40.7128] },
+	// 	{ name: 'Los Angeles', coords: [-118.2437, 34.0522] },
+	// 	{ name: 'Chicago', coords: [-87.6298, 41.8781] },
+	// 	{ name: 'SF', coords: [-122.4194, 37.7749] },
+	// ]
+	let cities = []
+	const locationCards = document.querySelectorAll('.location-card')
+	locationCards.forEach((card) => {
+		const data = {
+			name: card.getAttribute('data-city'),
+			coords: [
+				card.getAttribute('data-latitude'),
+				card.getAttribute('data-longitude'),
+			],
+		}
+
+		cities.push(data)
+	})
+
 	const cityGroup = g.append('g').attr('class', 'cities')
 	cityGroup
 		.selectAll('circle')
 		.data(cities)
 		.enter()
 		.append('circle')
+		.attr('class', 'city-marker')
+		.attr('data-index', (d, i) => i) // Assign unique index
 		.attr('cx', (d) => projection(d.coords)[0])
 		.attr('cy', (d) => projection(d.coords)[1])
 		.attr('r', 8)
 		.attr('fill', '#e58c32')
 		.attr('stroke', '#fff')
 		.attr('stroke-width', 1)
+	// .style('opacity', 0) // Initially hidden
 
 	// Add city labels
 	// cityGroup
@@ -90,33 +113,78 @@ async function chart() {
 	// 	.data(cities)
 	// 	.enter()
 	// 	.append('text')
-	// 	.attr('x', (d) => projection(d.coords)[0] + 7) // Offset text slightly
+	// 	.attr('class', 'city-label')
+	// 	.attr('data-index', (d, i) => i) // Assign unique index
+	// 	.attr('x', (d) => projection(d.coords)[0] + 7)
 	// 	.attr('y', (d) => projection(d.coords)[1])
 	// 	.text((d) => d.name)
 	// 	.attr('font-size', '12px')
 	// 	.attr('fill', 'black')
+	// .style('opacity', 0)
 
 	svg.call(zoom)
 	svg.call(zoom.transform, d3.zoomIdentity.scale(2))
-	//
-	moveToCity(0)
 
 	svg.on('zoom', null)
 
 	function moveToCity(index) {
 		const city = cities[index]
 		const [x, y] = projection(city.coords)
+		const offsetX = 0 // Adjust this value to move more right
+		const offsetY = 0 // Adjust this value to move more down
+
+		// Hide all city markers and labels
+		d3.selectAll('.city-marker, .city-label').style('opacity', 0)
+		// console.log(document.querySelector(`.city-marker[data-index="${index}"]`))
+
+		// Show only the current city's marker and label
+		d3.select(`.city-marker[data-index="${index}"]`).style('opacity', 1)
+		d3.select(`.city-label[data-index="${index}"]`).style('opacity', 1)
 
 		svg
 			.transition()
 			.duration(750)
 			.call(
 				zoom.transform,
-				d3.zoomIdentity.scale(2).translate(-x / 2, -y / 2),
+				d3.zoomIdentity
+					.scale(2)
+					.translate(width / 2 - x * 1.5, height / 2 - y * 1.5),
+				// .translate(-x / 2, -y / 2),
 
 				// .translate(width / 2 - x * 2, height / 2 - y * 2),
 			)
 	}
+	// 	function moveToCity(index) {
+	// 		const city = cities[index]
+	// 		const [x, y] = projection(city.coords)
+	// 		const offsetX = 20 // Move right
+	// 		const offsetY = 50 // Move down
+	//
+	// 		// Hide all city markers and labels
+	// 		d3.selectAll('.city-marker, .city-label').style('opacity', 0)
+	//
+	// 		// Show only the current city's marker and label with delay
+	// 		d3.select(`.city-marker[data-index="${index}"]`).style('opacity', 1)
+	// 		d3.select(`.city-label[data-index="${index}"]`)
+	// 			.transition()
+	// 			.delay(300)
+	// 			.style('opacity', 1)
+	// 			.raise() // Bring label to front
+	//
+	// 		svg
+	// 			.transition()
+	// 			.duration(750)
+	// 			.call(
+	// 				zoom.transform,
+	// 				d3.zoomIdentity
+	// 					.scale(2)
+	// 					.translate(width / 2 - x * 2 + offsetX, height / 2 - y * 2 + offsetY),
+	// 			)
+	// 	}
+
+	moveToCity(0)
+
+	// moveToCity(0)
 
 	function reset() {
 		states.transition().style('fill', null)
@@ -169,18 +237,40 @@ async function chart() {
 	})
 }
 
-chart()
+document.addEventListener('DOMContentLoaded', () => {
+	// Swiper.use([Navigation])
+	var swiper = new Swiper('.mySwiper', {
+		slidesPerView: 3.5,
+		centeredSlides: true,
+		spaceBetween: 30,
+		grabCursor: true,
+		freeMode: true,
+		// pagination: {
+		// 	el: '.swiper-pagination',
+		// 	clickable: true,
+		// },
+		navigation: {
+			nextEl: '.swiper-button-next',
+			prevEl: '.swiper-button-prev',
+		},
+	})
+	chart()
+	createIcons({
+		icons: { ChevronLeft, ChevronRight, ArrowRight },
+	})
+})
+// console.log(swiper)
 
-const data = [10, 25, 35, 50, 60]
-const svg = d3.select('svg')
-console.log(data)
-svg
-	.selectAll('rect')
-	.data(data)
-	.enter()
-	.append('rect')
-	.attr('x', (d, i) => i * 60)
-	.attr('y', (d, i) => 300 - d * 5)
-	.attr('width', 50)
-	.attr('height', (d) => d * 5)
-	.attr('fill', 'teal')
+// const data = [10, 25, 35, 50, 60]
+// const svg = d3.select('svg')
+// console.log(data)
+// svg
+// 	.selectAll('rect')
+// 	.data(data)
+// 	.enter()
+// 	.append('rect')
+// 	.attr('x', (d, i) => i * 60)
+// 	.attr('y', (d, i) => 300 - d * 5)
+// 	.attr('width', 50)
+// 	.attr('height', (d) => d * 5)
+// 	.attr('fill', 'teal')
