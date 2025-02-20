@@ -1,19 +1,23 @@
 import * as d3 from 'd3'
 import { ArrowRight, ChevronLeft, ChevronRight, createIcons } from 'lucide'
 import Swiper from 'swiper'
-// import Navigation from 'swiper/modules/navigation'
+import { Navigation } from 'swiper/modules'
 import 'swiper/css'
 import 'swiper/css/navigation'
+import * as topojson from 'topojson-client'
+import { places } from './location'
 
 import './style.scss'
 
-async function chart() {
+const markerImg =
+	'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzMiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCAzMyA0OCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE2LjUwNCAwQzcuMzg4OSAwIDAgNy40NzcwMiAwIDE2LjcxMDlDMCAyNS45NDQ4IDE2LjUwNCA0OCAxNi41MDQgNDhDMTYuNTA0IDQ4IDMzIDI1Ljk0NDggMzMgMTYuNzEwOUMzMyA3LjQ3NzAyIDI1LjYxOTIgMCAxNi41MDQgMFpNMTYuNTA0IDI3Ljc3NTNDMTAuNDcwMyAyNy43NzUzIDUuNTgyMDEgMjIuODIzMyA1LjU4MjAxIDE2LjcxMDlDNS41ODIwMSAxMC41OTg2IDEwLjQ3MDMgNS42NDY1OCAxNi41MDQgNS42NDY1OEMyMi41Mzc4IDUuNjQ2NTggMjcuNDI2MSAxMC41OTg2IDI3LjQyNjEgMTYuNzEwOUMyNy40MjYxIDIyLjgyMzMgMjIuNTM3OCAyNy43NzUzIDE2LjUwNCAyNy43NzUzWiIgZmlsbD0iI0JFNDUyOCIvPgo8cmVjdCB4PSI0IiB5PSI0IiB3aWR0aD0iMjUiIGhlaWdodD0iMjUiIHJ4PSIxMi41IiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTI1Ljk5OTUgMTYuNTYzMkMyMS43NDIgMTUuNDc5NSAxOC4wMDkyIDE0LjU0ODggMTQuMjkzMyAxMy41NDM3QzEzLjg5MDIgMTMuNDM2MiAxNC4wMDM2IDEzLjQ0ODUgMTMuNDM2OCAxMy4zMDM4QzEyLjk4MzMgMTEuNDUwNyAxMi4yMTkxIDguOTE5MjYgMTEuODA3NiA3QzE1LjMwOTQgMTAuODY3NSAxMy45MzY0IDkuOTA3ODUgMTkuMTAwOSAxMC44MzAzQzIxLjg2MzcgMTEuMzIyNSAyMi45MzAyIDExLjU2NjUgMjQuNzYwOSAxMS43OTgyQzI1LjAwMDMgMTIuNDQzNCAyNS43MjY2IDE1LjE4MTcgMjUuOTk5NSAxNi41NjMyWiIgZmlsbD0iIzNGNkJBOSIvPgo8cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTEwLjU5ODYgMjQuOTMxMkMxMy41OTY2IDIxLjc2NjkgMTYuMjEyNCAxOC45NzQ4IDE4Ljg3ODcgMTYuMjQwN0MxOS4xNjg0IDE1Ljk0MjkgMTkuMjYwNyAxNS44Njg1IDE5LjY2MzggMTUuNDQ2NUMyMS40OTQ1IDE1Ljk1OTQgMjMuOTkyOCAxNi40ODg5IDI1LjkwMzMgMTcuMDQ3M0MyMC43ODQ5IDE4LjIzNDQgMjIuMDQ0NiAxNy44MTI1IDE5LjAwNDYgMjEuNjk2NUMxNy4yMzI4IDIzLjk1OTEgMTYuNTE4OSAyNC42NTgyIDE1LjQzOTggMjYuMTMwN0wxMC41OTg2IDI0LjkzMTJaIiBmaWxsPSIjMTY0MjhBIi8+CjxwYXRoIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNMTEuNTA2IDcuMDYyMDFDMTIuNDQyMyAxMS4yNjA0IDEzLjIyMzMgMTUuNjMyNSAxNC4yMzEgMTkuMjk3M0MxNC4zNDAyIDE5LjY5NDQgMTQuMjY0NiAxOS40ODM1IDE0LjQyNDIgMjAuMDM3N0MxMy4xNTE5IDIxLjQ1MjQgMTEuNzM2OSAyMy4xMjM0IDEwLjI1OSAyNC42MTY3QzExLjYyNzggMjEuMDU1MyAxMS44MjA5IDIwLjg4NTcgMTAuMDA3IDE2LjAzNzlDOS4wMzcxIDEzLjQ0NDQgOC43MjYzOSAxMi40MDYyIDggMTAuNzM1MUM4LjQ0MDg3IDEwLjE5NzQgMTAuNDM1MyA3Ljk5MjY5IDExLjUwNiA3LjA2MjAxWiIgZmlsbD0iIzc4QUREMyIvPgo8L3N2Zz4K'
+
+async function usaMap() {
 	const width = 975
 	const height = 610
 	let currentCity = 0
 
 	const us = await d3.json('https://d3js.org/us-10m.v2.json') // ? loading the map asset
-	// const us = await d3.json('./countries-110m.json') // ? loading the map asset
 
 	// ? helpful to plot the points
 	const projection = d3
@@ -24,9 +28,9 @@ async function chart() {
 
 	const zoom = d3
 		.zoom()
-		.scaleExtent([2, 2])
+		.scaleExtent([1.25, 1.25])
 		.translateExtent([
-			[2, 2],
+			[0, 0],
 			[width, height],
 		])
 		.on('zoom', (e) => {
@@ -63,20 +67,6 @@ async function chart() {
 		.attr('stroke', 'white')
 		.attr('stroke-linejoin', 'round')
 		.attr('d', path(topojson.mesh(us, us.objects.states, (a, b) => a !== b)))
-
-	// g.append('path')
-	// 	.attr('fill', 'none')
-	// 	.attr('stroke', 'white')
-	// 	.attr('stroke-width', 0.5) // Reduce line thickness
-	// 	.attr('stroke-linejoin', 'round')
-	// 	.attr('d', path(topojson.mesh(us, us.objects.states, (a, b) => a !== b)))
-
-	// const cities = [
-	// 	{ name: 'New York', coords: [-74.006, 40.7128] },
-	// 	{ name: 'Los Angeles', coords: [-118.2437, 34.0522] },
-	// 	{ name: 'Chicago', coords: [-87.6298, 41.8781] },
-	// 	{ name: 'SF', coords: [-122.4194, 37.7749] },
-	// ]
 	let cities = []
 	const locationCards = document.querySelectorAll('.location-card')
 	locationCards.forEach((card) => {
@@ -105,25 +95,9 @@ async function chart() {
 		.attr('fill', '#e58c32')
 		.attr('stroke', '#fff')
 		.attr('stroke-width', 1)
-	// .style('opacity', 0) // Initially hidden
-
-	// Add city labels
-	// cityGroup
-	// 	.selectAll('text')
-	// 	.data(cities)
-	// 	.enter()
-	// 	.append('text')
-	// 	.attr('class', 'city-label')
-	// 	.attr('data-index', (d, i) => i) // Assign unique index
-	// 	.attr('x', (d) => projection(d.coords)[0] + 7)
-	// 	.attr('y', (d) => projection(d.coords)[1])
-	// 	.text((d) => d.name)
-	// 	.attr('font-size', '12px')
-	// 	.attr('fill', 'black')
-	// .style('opacity', 0)
 
 	svg.call(zoom)
-	svg.call(zoom.transform, d3.zoomIdentity.scale(2))
+	svg.call(zoom.transform, d3.zoomIdentity.scale(1.5))
 
 	svg.on('zoom', null)
 
@@ -141,88 +115,34 @@ async function chart() {
 		d3.select(`.city-marker[data-index="${index}"]`).style('opacity', 1)
 		d3.select(`.city-label[data-index="${index}"]`).style('opacity', 1)
 
+		const currentTransform = d3.zoomTransform(svg.node())
+
 		svg
 			.transition()
 			.duration(750)
 			.call(
 				zoom.transform,
 				d3.zoomIdentity
-					.scale(2)
-					.translate(width / 2 - x * 1.5, height / 2 - y * 1.5),
+					.scale(currentTransform.k)
+					.translate(
+						currentTransform.x +
+							(width / 2 -
+								x * currentTransform.k +
+								offsetX -
+								currentTransform.x),
+						currentTransform.y +
+							(height / 2 -
+								y * currentTransform.k +
+								offsetY -
+								currentTransform.y),
+					),
 				// .translate(-x / 2, -y / 2),
 
 				// .translate(width / 2 - x * 2, height / 2 - y * 2),
 			)
 	}
-	// 	function moveToCity(index) {
-	// 		const city = cities[index]
-	// 		const [x, y] = projection(city.coords)
-	// 		const offsetX = 20 // Move right
-	// 		const offsetY = 50 // Move down
-	//
-	// 		// Hide all city markers and labels
-	// 		d3.selectAll('.city-marker, .city-label').style('opacity', 0)
-	//
-	// 		// Show only the current city's marker and label with delay
-	// 		d3.select(`.city-marker[data-index="${index}"]`).style('opacity', 1)
-	// 		d3.select(`.city-label[data-index="${index}"]`)
-	// 			.transition()
-	// 			.delay(300)
-	// 			.style('opacity', 1)
-	// 			.raise() // Bring label to front
-	//
-	// 		svg
-	// 			.transition()
-	// 			.duration(750)
-	// 			.call(
-	// 				zoom.transform,
-	// 				d3.zoomIdentity
-	// 					.scale(2)
-	// 					.translate(width / 2 - x * 2 + offsetX, height / 2 - y * 2 + offsetY),
-	// 			)
-	// 	}
 
 	moveToCity(0)
-
-	// moveToCity(0)
-
-	function reset() {
-		states.transition().style('fill', null)
-		svg
-			.transition()
-			.duration(750)
-			.call(
-				zoom.transform,
-				d3.zoomIdentity,
-				d3.zoomTransform(svg.node()).invert([width / 2, height / 2]),
-			)
-	}
-
-	function clicked(event, d) {
-		const [[x0, y0], [x1, y1]] = path.bounds(d)
-		event.stopPropagation()
-		states.transition().style('fill', null)
-		d3.select(this).transition().style('fill', 'red')
-		svg
-			.transition()
-			.duration(750)
-			.call(
-				zoom.transform,
-				d3.zoomIdentity
-					.translate(width / 2, height / 2)
-					.scale(
-						Math.min(8, 0.9 / Math.max((x1 - x0) / width, (y1 - y0) / height)),
-					)
-					.translate(-(x0 + x1) / 2, -(y0 + y1) / 2),
-				d3.pointer(event, svg.node()),
-			)
-	}
-
-	function zoomed(event) {
-		const { transform } = event
-		g.attr('transform', transform)
-		g.attr('stroke-width', 1 / transform.k)
-	}
 
 	document.getElementById('map-container').appendChild(svg.node())
 
@@ -237,40 +157,322 @@ async function chart() {
 	})
 }
 
+async function worldMap() {
+	const width = 800,
+		height = 800
+	let zoomLevel = 2.25
+	let currentCity = 0
+
+	const world = await d3.json(
+		'https://unpkg.com/world-atlas@2.0.2/countries-110m.json',
+	) // ? loading the map asset
+
+	const countries = topojson.feature(world, world.objects.countries)
+
+	const projection = d3
+		.geoOrthographic()
+		.scale(350)
+		.translate([width / 2, height / 2])
+		.rotate([100, -24])
+
+	const path = d3.geoPath().projection(projection)
+
+	// svg.call(zoom.transform, d3.zoomIdentity.scale(1.5))
+
+	const svg = d3
+		.create('svg')
+		.attr('viewBox', [0, 0, width, height])
+		.attr('width', width)
+		.attr('height', height)
+		.attr('style', 'max-width: 100%;')
+
+	svg
+		.append('clipPath')
+		.attr('id', 'clip')
+		.append('circle')
+		.attr('cx', width / 2)
+		.attr('cy', height / 2)
+		.attr('r', projection.scale())
+
+	svg
+		.append('circle')
+		.attr('cx', width / 2)
+		.attr('cy', height / 2)
+		.attr('r', projection.scale())
+		.attr('fill', '#e3e4e5')
+		.attr('stroke', '#fff')
+		.attr('stroke-width', 0.5)
+
+	const g = svg
+		.append('g')
+		.attr('class', 'countries')
+		.attr('clip-path', 'url(#clip)')
+
+	g.selectAll('path')
+		.data(countries.features)
+		.join('path')
+		.attr('d', path)
+		.attr('fill', '#f6f6f6')
+		.attr('stroke', '#fff')
+		.attr('stroke-width', 0.3)
+
+	g.selectAll('.country-borders')
+		.data(countries.features)
+		.join('path')
+		.attr('class', 'country-borders')
+		.attr('d', path)
+		.attr('fill', 'none')
+		.attr('stroke', 'red') // Dark border color
+		.attr('stroke-width', 0.5)
+
+	const countriesPath = g
+		.selectAll('path')
+		.data(countries.features)
+		.join('path')
+		.attr('d', path)
+		.attr('fill', '#f6f6f6')
+		.attr('stroke', '#fff')
+		.attr('stroke-width', 0.3)
+
+	const gradient = svg
+		.append('defs') // Add definitions
+		.append('radialGradient')
+		.attr('id', 'shine')
+		.attr('cx', '50%') // Center of the gradient (same as the center of the globe)
+		.attr('cy', '50%')
+		.attr('r', '50%') // Radius of the gradient
+		.attr('fx', '50%') // Focus point of the gradient (center of the circle)
+		.attr('fy', '50%')
+
+	gradient
+		.append('stop')
+		.attr('offset', '0%') // Center of the gradient (lit area)
+		.attr('stop-color', '#fff') // Light color in the center
+		.attr('stop-opacity', 0)
+
+	gradient
+		.append('stop')
+		.attr('offset', '50%') // Center of the gradient (lit area)
+		.attr('stop-color', '#fff') // Light color in the center
+		.attr('stop-opacity', 0)
+
+	gradient
+		.append('stop')
+		.attr('offset', '100%') // Outer edge of the gradient
+		.attr('stop-color', '#ededed') // Dark color for edges
+		.attr('stop-opacity', 0.6)
+
+	svg
+		.append('circle')
+		.attr('cx', width / 2)
+		.attr('cy', height / 2)
+		.attr('r', projection.scale())
+		.attr('fill', 'url(#shine)') // Use the defined gradient
+		.attr('stroke', '#ededed')
+		.attr('stroke-width', 0.5)
+
+	let cities = []
+	const locationCards = document.querySelectorAll('.location-card')
+	locationCards.forEach((card) => {
+		const data = {
+			name: card.getAttribute('data-city'),
+			coords: [
+				card.getAttribute('data-longitude'),
+				card.getAttribute('data-latitude'),
+			],
+		}
+
+		cities.push(data)
+	})
+
+	const cityGroup = g
+		.append('g')
+		.attr('class', 'cities')
+		.attr('clip-path', 'url(#clip)')
+
+	cityGroup
+		.selectAll('circle')
+		.data(cities)
+		.enter()
+		.append('circle')
+		.attr('class', 'city-marker')
+		.attr('data-index', (d, i) => i) // Assign unique index
+		.attr('cx', (d) => projection(d.coords)[0])
+		.attr('cy', (d) => projection(d.coords)[1])
+		.attr('r', 4)
+		.attr('fill', '#e58c32')
+		.attr('stroke', '#fff')
+		.attr('stroke-width', 1)
+
+	const zoom = d3
+		.zoom()
+		.scaleExtent([3, 3]) // Define zoom range
+		.on('zoom', (event) => {
+			zoomLevel = event.transform.k
+			projection.scale(350 * zoomLevel) // Adjust the projection scale
+			countriesPath.attr('d', path)
+
+			cityGroup
+				.selectAll('.city-marker')
+				.attr('cx', (d) => projection(d.coords)[0])
+				.attr('cy', (d) => projection(d.coords)[1])
+		})
+
+	svg.call(zoom).call(zoom.transform, d3.zoomIdentity.scale(zoomLevel))
+
+	document.getElementById('map-container').appendChild(svg.node())
+
+	// 	function moveToCity(index) {
+	// 		const city = cities[index]
+	// 		const [x, y] = projection(city.coords)
+	// 		const offsetX = 0 // Adjust if needed
+	// 		const offsetY = 0
+	//
+	// 		const currentTransform = d3.zoomTransform(svg.node())
+	//
+	// 		// Gray out all city markers
+	// 		d3.selectAll('.city-marker')
+	// 			.attr('fill', '#aaa') // Gray color for inactive markers
+	// 			.attr('r', 3) // Optional: Make them smaller
+	//
+	// 		// Highlight only the selected city marker
+	// 		d3.select(`.city-marker[data-index="${index}"]`)
+	// 			.attr('fill', '#e58c32') // Highlight color
+	// 			.attr('r', 5) // Optional: Make it slightly larger
+	//
+	// 		// Hide all labels, then show only the current city's label
+	// 		d3.selectAll('.city-label').style('opacity', 0)
+	// 		d3.select(`.city-label[data-index="${index}"]`).style('opacity', 1)
+	//
+	// 		const newX = width / 2 - x
+	// 		const newY = height / 2 - y
+	//
+	// 		svg
+	// 			.transition()
+	// 			.duration(750)
+	// 			.tween('move', () => {
+	// 				const interpolate = d3.interpolate(
+	// 					[currentTransform.x, currentTransform.y],
+	// 					[newX, newY],
+	// 				)
+	// 				return (t) => {
+	// 					zoom.transform(
+	// 						svg,
+	// 						d3.zoomIdentity
+	// 							.translate(...interpolate(t))
+	// 							.scale(currentTransform.k),
+	// 					)
+	// 				}
+	// 			})
+	//
+	// 		// Smoothly zoom and center the selected city
+	// 		// svg
+	// 		// 	.transition()
+	// 		// 	.duration(750)
+	// 		// 	.call(zoom.translateTo, width / 2 - 50, height / 2 - 50)
+	//
+	// 		// svg
+	// 		// 	.transition()
+	// 		// 	.duration(750)
+	// 		// 	.call(
+	// 		// 		zoom.transform,
+	// 		// 		d3.zoomIdentity
+	// 		// 			.scale(currentTransform.k)
+	// 		// 			.translate(
+	// 		// 				currentTransform.x +
+	// 		// 					(width / 2 -
+	// 		// 						x * currentTransform.k +
+	// 		// 						offsetX -
+	// 		// 						currentTransform.x),
+	// 		// 				currentTransform.y +
+	// 		// 					(height / 2 -
+	// 		// 						y * currentTransform.k +
+	// 		// 						offsetY -
+	// 		// 						currentTransform.y),
+	// 		// 			),
+	// 		// 	)
+	// 	}
+
+	function moveToCity(index) {
+		const city = cities[index]
+		const [lon, lat] = city.coords.map(Number) // Ensure numeric values
+
+		// Calculate new rotation so that the city is at the center
+		const newRotation = [-lon, -lat + 5]
+
+		d3.selectAll('.city-marker').attr('fill', '#ccc') // Gray out all markers
+
+		d3.select(`.city-marker[data-index="${index}"]`).attr('fill', '#e58c32') // Highlight the selected marker
+
+		d3.transition()
+			.duration(750)
+			.tween('rotate', () => {
+				const interp = d3.interpolate(projection.rotate(), newRotation)
+				return (t) => {
+					projection.rotate(interp(t))
+					g.selectAll('path').attr('d', path) // Update country positions
+					d3.selectAll('.city-marker')
+						.attr('cx', (d) => projection(d.coords)[0])
+						.attr('cy', (d) => projection(d.coords)[1]) // Update city positions
+				}
+			})
+	}
+
+	moveToCity(0)
+
+	document.getElementById('next-btn').addEventListener('click', () => {
+		currentCity = (currentCity + 1) % cities.length
+		moveToCity(currentCity)
+	})
+
+	document.getElementById('prev-btn').addEventListener('click', () => {
+		currentCity = (currentCity - 1 + cities.length) % cities.length
+		moveToCity(currentCity)
+	})
+}
+
 document.addEventListener('DOMContentLoaded', () => {
-	// Swiper.use([Navigation])
 	var swiper = new Swiper('.mySwiper', {
 		slidesPerView: 3.5,
 		centeredSlides: true,
 		spaceBetween: 30,
 		grabCursor: true,
 		freeMode: true,
-		// pagination: {
-		// 	el: '.swiper-pagination',
-		// 	clickable: true,
-		// },
 		navigation: {
 			nextEl: '.swiper-button-next',
 			prevEl: '.swiper-button-prev',
 		},
+		modules: [Navigation],
 	})
-	chart()
+
+	// usaMap()
+	worldMap()
+
 	createIcons({
 		icons: { ChevronLeft, ChevronRight, ArrowRight },
 	})
-})
-// console.log(swiper)
 
-// const data = [10, 25, 35, 50, 60]
-// const svg = d3.select('svg')
-// console.log(data)
-// svg
-// 	.selectAll('rect')
-// 	.data(data)
-// 	.enter()
-// 	.append('rect')
-// 	.attr('x', (d, i) => i * 60)
-// 	.attr('y', (d, i) => 300 - d * 5)
-// 	.attr('width', 50)
-// 	.attr('height', (d) => d * 5)
-// 	.attr('fill', 'teal')
+	console.log(ArrowRight)
+
+	const locationWrapper = document.querySelector('.location-wrapper')
+
+	places.forEach((place) => {
+		const locationCard = document.createElement('div')
+
+		locationCard.classList.add('swiper-slide')
+		locationCard.classList.add('location-card')
+		locationCard.setAttribute('data-city', place.city)
+		locationCard.setAttribute('data-latitude', place.lat)
+		locationCard.setAttribute('data-longitude', place.lng)
+		locationCard.style.backgroundImage = `url(${place.img})`
+
+		locationCard.innerHTML = `
+			<div class="location-card-body">
+				<p class="city-name">${place.city}</p>
+				<span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="arrow-right" class="lucide lucide-arrow-right"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></span>
+			</div>
+		`
+
+		locationWrapper.appendChild(locationCard)
+	})
+})

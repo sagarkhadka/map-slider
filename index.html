@@ -17,64 +17,17 @@
 					<a>GET MY FREE CONSULATION</a>
 				</div>
 			</div>
-			<div id="map-container"></div>
+			<div class="globe">
+				<div class="pin">
+					<img src="/image.svg" />
+				</div>
+				<div id="map-container"></div>
+			</div>
 		</section>
 
 		<section class="slider">
 			<div class="swiper mySwiper">
-				<div class="swiper-wrapper">
-					<div
-						class="swiper-slide location-card"
-						data-city="Chicago"
-						data-latitude="-87.6298"
-						data-longitude="41.8781"
-						style="
-							--bg: url(https://images.unsplash.com/photo-1508433957232-3107f5fd5995?q=80&w=2086&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D);
-						">
-						<div class="location-card-body">
-							<p class="city-name">Chicago</p>
-							<i data-lucide="arrow-right"></i>
-						</div>
-					</div>
-					<div
-						class="swiper-slide location-card"
-						data-city="Los Angeles"
-						data-latitude="-118.2437"
-						data-longitude="34.0522">
-						<div class="location-card-body">
-							<p class="city-name">Los Angeles</p>
-							<i data-lucide="arrow-right"></i>
-						</div>
-					</div>
-					<div
-						class="swiper-slide location-card"
-						data-city="san francisco"
-						data-latitude="-122.4194"
-						data-longitude="37.7749"
-						style="
-							--bg: url(https://images.unsplash.com/photo-1422464804701-7d8356b3a42f?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D);
-						">
-						<div class="location-card-body">
-							<p class="city-name">San Francisco</p>
-							<i data-lucide="arrow-right"></i>
-						</div>
-					</div>
-					<div
-						class="swiper-slide location-card"
-						data-city="New York"
-						data-latitude="-74.006"
-						data-longitude="40.7128"
-						style="
-							--bg: url(https://images.unsplash.com/photo-1530959106156-50f49c30932d?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D);
-						">
-						<div class="location-card-body">
-							<p class="city-name">New York</p>
-							<i data-lucide="arrow-right"></i>
-						</div>
-					</div>
-					<!-- <div class="swiper-slide location-card">
-						<div class="location-card-body">Location 5</div>
-					</div> -->
+				<div class="swiper-wrapper location-wrapper"></div>
 				</div>
 				<button id="prev-btn" class="swiper-button-prev swiper-btn">
 					<i data-lucide="chevron-left" data-size="18"></i>
@@ -84,8 +37,6 @@
 				</button>
 			</div>
 		</section>
-
-		<script src="https://unpkg.com/topojson@3"></script>
 		<script type="module" src="./src/main.js"></script>
 	</body>
 </html>
