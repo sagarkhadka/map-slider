@@ -202,6 +202,7 @@ async function worldMap() {
 		.attr('fill', '#e3e4e5')
 		.attr('stroke', '#fff')
 		.attr('stroke-width', 0.5)
+		.attr('class', 'water-body')
 
 	const g = svg
 		.append('g')
@@ -230,9 +231,10 @@ async function worldMap() {
 		.data(countries.features)
 		.join('path')
 		.attr('d', path)
-		.attr('fill', '#f6f6f6')
+		.attr('fill', '#fff')
 		.attr('stroke', '#fff')
 		.attr('stroke-width', 0.3)
+		.attr('class', 'land-body')
 
 	const gradient = svg
 		.append('defs') // Add definitions
@@ -400,7 +402,7 @@ async function worldMap() {
 		// Calculate new rotation so that the city is at the center
 		const newRotation = [-lon, -lat + 5]
 
-		d3.selectAll('.city-marker').attr('fill', '#ccc') // Gray out all markers
+		d3.selectAll('.city-marker').attr('fill', '#c3c3c4') // Gray out all markers
 
 		d3.select(`.city-marker[data-index="${index}"]`).attr('fill', '#e58c32') // Highlight the selected marker
 

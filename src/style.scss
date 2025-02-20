@@ -29,6 +29,7 @@ svg {
 	display: grid;
 	align-items: center;
 	grid-template-columns: repeat(2, 1fr);
+	overflow: clip;
 
 	.titles {
 		display: flex;
@@ -103,6 +104,9 @@ svg {
 			width: 100%;
 			pointer-events: none;
 			position: absolute;
+			top: 10%;
+			scale: 1.2;
+			left: -11%;
 
 			svg {
 				top: 0;
@@ -174,34 +178,34 @@ svg {
 			}
 		}
 	}
-}
 
-.swiper-btn {
-	height: 48px;
-	width: 48px;
-	border-radius: 40px;
-	border: none;
-	color: #fff;
-	background-color: #354d7d;
+	.swiper-btn {
+		height: 48px;
+		width: 48px;
+		border-radius: 40px;
+		border: none;
+		color: #fff;
+		background-color: #354d7d;
 
-	svg {
-		height: 24px;
-		width: 24px;
-	}
+		svg {
+			height: 24px;
+			width: 24px;
+		}
 
-	&::after {
-		display: none;
-	}
+		&::after {
+			display: none;
+		}
 
-	&:is(.swiper-button-prev) {
-		left: 14%;
-	}
+		&:is(.swiper-button-prev) {
+			left: 14%;
+		}
 
-	&:is(.swiper-button-next) {
-		right: 14%;
-	}
+		&:is(.swiper-button-next) {
+			right: 14%;
+		}
 
-	&:is(.swiper-button-disabled) {
-		cursor: not-allowed;
+		&:is(.swiper-button-disabled) {
+			cursor: not-allowed;
+		}
 	}
 }
