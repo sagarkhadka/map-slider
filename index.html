@@ -19,23 +19,25 @@
 			</div>
 			<div class="globe">
 				<div id="map-container">
-					<div class="pin">
+					<!-- <div class="pin">
 						<img src="/image.svg" />
-					</div>
+					</div> -->
 				</div>
 			</div>
 		</section>
 
 		<section class="slider">
+			<div class="btn-wrapper">
+				<button id="prev-btn" class="swiper-button-prev swiper-btn">
+					<i data-lucide="chevron-left" data-size="18"></i>
+				</button>
+				<button id="next-btn" class="swiper-button-next swiper-btn">
+					<i data-lucide="chevron-right"></i>
+				</button>
+			</div>
 			<div class="swiper mySwiper">
 				<div class="swiper-wrapper location-wrapper"></div>
 			</div>
-			<button id="prev-btn" class="swiper-button-prev swiper-btn">
-				<i data-lucide="chevron-left" data-size="18"></i>
-			</button>
-			<button id="next-btn" class="swiper-button-next swiper-btn">
-				<i data-lucide="chevron-right"></i>
-			</button>
 		</section>
 		<script type="module" src="./src/main.js"></script>
 	</body>

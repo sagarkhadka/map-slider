@@ -20,9 +20,9 @@ body {
 	overflow-y: scroll;
 }
 
-svg {
-	pointer-events: none;
-}
+// svg {
+// 	pointer-events: none;
+// }
 
 .hero {
 	// padding-block-start: 2rem;
@@ -39,6 +39,7 @@ svg {
 		// grid-row: 1 / 1;
 		z-index: 2;
 		justify-content: flex-end;
+		pointer-events: none;
 
 		.wrapper {
 			max-width: 43.75rem;
@@ -76,7 +77,7 @@ svg {
 		.pin {
 			position: absolute;
 			top: 45%;
-			left: 40.45%;
+			left: 24rem;
 			// transform: translate(-50%, -50%);
 			z-index: 4;
 		}
@@ -102,7 +103,7 @@ svg {
 			overflow: clip;
 			height: 100%;
 			width: 100%;
-			pointer-events: none;
+			// pointer-events: none;
 			position: absolute;
 			top: 10%;
 			scale: 1.2;
@@ -134,15 +135,19 @@ svg {
 			align-items: center;
 
 			.location-card {
-				height: 234px;
-				width: 446px;
+				height: 224px;
+				// width: 426px;
 				background-size: cover;
 				background-repeat: no-repeat;
 				background-position: center;
 				overflow: hidden;
 				border-radius: 24px;
-				filter: grayscale(1);
+				filter: grayscale(0.8);
 				transition: all 200ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+				@media screen and (max-width: 768px) {
+					height: 175px;
+				}
 
 				&:is(.swiper-slide-active) {
 					// height: 256px;
@@ -166,8 +171,9 @@ svg {
 					justify-content: space-between;
 
 					.city-name {
-						font-size: 24px;
+						font-size: 22px;
 						color: #fff;
+						font-weight: 600;
 					}
 
 					svg {
@@ -179,33 +185,47 @@ svg {
 		}
 	}
 
-	.swiper-btn {
-		height: 48px;
-		width: 48px;
-		border-radius: 40px;
-		border: none;
-		color: #fff;
-		background-color: #354d7d;
+	.btn-wrapper {
+		display: flex;
+		align-items: center;
+		justify-content: flex-end;
+		margin-bottom: 2rem;
+		margin-right: 8rem;
+		gap: 2rem;
 
-		svg {
-			height: 24px;
-			width: 24px;
-		}
+		.swiper-btn {
+			height: 48px;
+			width: 48px;
+			border-radius: 40px;
+			border: none;
+			color: #fff;
+			background-color: #354d7d;
+			position: relative;
 
-		&::after {
-			display: none;
-		}
+			svg {
+				height: 24px;
+				width: 24px;
+			}
 
-		&:is(.swiper-button-prev) {
-			left: 14%;
-		}
+			&::after {
+				display: none;
+			}
 
-		&:is(.swiper-button-next) {
-			right: 14%;
-		}
+			// 		&:is(.swiper-button-prev) {
+			// 			left: 14%;
+			// 		}
+			//
+			// 		&:is(.swiper-button-next) {
+			// 			right: 14%;
+			// 		}
 
-		&:is(.swiper-button-disabled) {
-			cursor: not-allowed;
+			&:is(.swiper-button-disabled) {
+				cursor: not-allowed;
+			}
 		}
 	}
+}
+
+.city-marker {
+	cursor: pointer;
 }

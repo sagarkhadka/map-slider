@@ -272,6 +272,7 @@ async function worldMap() {
 		.attr('fill', 'url(#shine)') // Use the defined gradient
 		.attr('stroke', '#ededed')
 		.attr('stroke-width', 0.5)
+		.attr('style', 'pointer-events: none')
 
 	let cities = []
 	const locationCards = document.querySelectorAll('.location-card')
@@ -308,7 +309,7 @@ async function worldMap() {
 
 	const zoom = d3
 		.zoom()
-		.scaleExtent([3, 3]) // Define zoom range
+		.scaleExtent([zoomLevel, zoomLevel]) // Define zoom range
 		.on('zoom', (event) => {
 			zoomLevel = event.transform.k
 			projection.scale(350 * zoomLevel) // Adjust the projection scale
@@ -319,6 +320,14 @@ async function worldMap() {
 				.attr('cx', (d) => projection(d.coords)[0])
 				.attr('cy', (d) => projection(d.coords)[1])
 		})
+
+	svg
+		.append('image')
+		.attr('href', markerImg)
+		.attr('width', 40)
+		.attr('height', 40)
+		.attr('x', width / 2 - 20)
+		.attr('y', height / 2 - 120)
 
 	svg.call(zoom).call(zoom.transform, d3.zoomIdentity.scale(zoomLevel))
 
@@ -420,22 +429,8 @@ async function worldMap() {
 			})
 	}
 
-	moveToCity(0)
-
-	document.getElementById('next-btn').addEventListener('click', () => {
-		currentCity = (currentCity + 1) % cities.length
-		moveToCity(currentCity)
-	})
-
-	document.getElementById('prev-btn').addEventListener('click', () => {
-		currentCity = (currentCity - 1 + cities.length) % cities.length
-		moveToCity(currentCity)
-	})
-}
-
-document.addEventListener('DOMContentLoaded', () => {
 	var swiper = new Swiper('.mySwiper', {
-		slidesPerView: 3.5,
+		slidesPerView: 4,
 		centeredSlides: true,
 		spaceBetween: 30,
 		grabCursor: true,
@@ -447,6 +442,34 @@ document.addEventListener('DOMContentLoaded', () => {
 		modules: [Navigation],
 	})
 
+	swiper.on('slideChange', () => {
+		console.log('*** mySwiper.realIndex', swiper.activeIndex)
+		moveToCity(swiper.activeIndex)
+		currentCity = swiper.activeIndex
+	})
+
+	const pins = document.querySelectorAll('.city-marker')
+	pins.forEach((pin, index) => {
+		pin.addEventListener('click', () => {
+			moveToCity(index)
+			swiper.slideTo(index, 750)
+		})
+	})
+
+	moveToCity(0)
+
+	document.getElementById('next-btn').addEventListener('click', () => {
+		// currentCity = (currentCity + 1) % cities.length
+		moveToCity(currentCity)
+	})
+
+	document.getElementById('prev-btn').addEventListener('click', () => {
+		// currentCity = (currentCity - 1 + cities.length) % cities.length
+		moveToCity(currentCity)
+	})
+}
+
+document.addEventListener('DOMContentLoaded', () => {
 	// usaMap()
 	worldMap()
 
@@ -454,10 +477,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		icons: { ChevronLeft, ChevronRight, ArrowRight },
 	})
 
-	console.log(ArrowRight)
-
 	const locationWrapper = document.querySelector('.location-wrapper')
-
 	places.forEach((place) => {
 		const locationCard = document.createElement('div')
 
