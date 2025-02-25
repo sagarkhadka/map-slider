@@ -162,6 +162,7 @@ async function worldMap() {
 		height = 800
 	let zoomLevel = 2.25
 	let currentCity = 0
+	let rotation = [100, -24]
 
 	const world = await d3.json(
 		'https://unpkg.com/world-atlas@2.0.2/countries-110m.json',
@@ -185,6 +186,56 @@ async function worldMap() {
 		.attr('width', width)
 		.attr('height', height)
 		.attr('style', 'max-width: 100%;')
+		.attr('id', 'globe')
+
+	// 	const handleDrag = () => {
+	// 		const globe = document.getElementById('globe')
+	// 		console.log(globe)
+	//
+	// 		let isDragging = false
+	// 		let lastX, lastY
+	// 		let rotation = projection.rotate() // Initial rotation
+	//
+	// 		const onDragStart = (e) => {
+	// 			isDragging = true
+	// 			lastX = e.pageX
+	// 			lastY = e.pageY
+	// 		}
+	//
+	// 		const onDrag = (e) => {
+	// 			if (!isDragging) return
+	//
+	// 			// Calculate the change in mouse position
+	// 			const dx = e.pageX - lastX
+	// 			const dy = e.pageY - lastY
+	//
+	// 			lastX = e.pageX
+	// 			lastY = e.pageY
+	//
+	// 			// Adjust rotation based on mouse movement
+	// 			rotation[0] += dx * 0.2 // Horizontal drag
+	// 			rotation[1] -= dy * 0.2 // Vertical drag
+	//
+	// 			projection.rotate(rotation)
+	//
+	// 			// Update map
+	// 			g.selectAll('path').attr('d', path)
+	// 			d3.selectAll('.city-marker')
+	// 				.attr('cx', (d) => projection(d.coords)[0])
+	// 				.attr('cy', (d) => projection(d.coords)[1])
+	// 		}
+	//
+	// 		const onDragEnd = () => {
+	// 			isDragging = false
+	// 		}
+	//
+	// 		if (globe) {
+	// 			globe.addEventListener('pointerdown', onDragStart)
+	// 			globe.addEventListener('pointermove', onDrag)
+	// 			globe.addEventListener('pointerup', onDragEnd)
+	// 			globe.addEventListener('pointerleave', onDragEnd) // Handle case where mouse leaves element
+	// 		}
+	// 	}
 
 	svg
 		.append('clipPath')
@@ -203,6 +254,7 @@ async function worldMap() {
 		.attr('stroke', '#fff')
 		.attr('stroke-width', 0.5)
 		.attr('class', 'water-body')
+	// .attr('style', 'cursor: move;')
 
 	const g = svg
 		.append('g')
@@ -328,88 +380,91 @@ async function worldMap() {
 		.attr('height', 40)
 		.attr('x', width / 2 - 20)
 		.attr('y', height / 2 - 120)
+		.attr('id', 'marker')
+		.attr('style', 'transition: all 200ms ease-in-out;')
 
 	svg.call(zoom).call(zoom.transform, d3.zoomIdentity.scale(zoomLevel))
+	// svg.on('click', () => {
+	// 	console.log('dragging')
+	// })
+
+	svg.call(d3.drag().on('start', () => console.log('dragging')))
+
+	const drag = d3.drag().on('drag', (event) => {
+		console.log('drag event')
+		rotation[0] += event.dx * 0.2 // Rotate on X-axis
+		rotation[1] -= event.dy * 0.2 // Rotate on Y-axis
+		projection.rotate(rotation)
+		g.selectAll('path').attr('d', path)
+	})
+
+	// let rotation = projection.rotate(),
+	let startRotation, dragIndex
+	const dragThis = d3
+		.drag()
+		.on('start', () => {
+			startRotation = [...rotation]
+		})
+		.on('drag', (e) => {
+			// this is center point of the map
+			const center = [400, 331.3648525862192]
+			console.log(startRotation)
+			console.log(e)
+
+			rotation[0] += e.dx * 0.2
+			rotation[1] -= e.dy * 0.2
+			projection.rotate(rotation)
+			g.selectAll('path').attr('d', path) // moves the map
+			// moves the city marker
+			d3.selectAll('.city-marker')
+				.attr('cx', (d) => projection(d.coords)[0])
+				.attr('cy', (d) => projection(d.coords)[1])
+
+			const determineClosest = () => {
+				const cityMarkers = document.querySelectorAll('.city-marker')
+				let coordinates = [],
+					diff = []
+
+				// get the coordinates of the city markers
+				cityMarkers.forEach((mark, index) => {
+					const x = mark.getAttribute('cx')
+					const y = mark.getAttribute('cy')
+					coordinates.push([x, y])
+				})
+
+				// get the difference between the center and the city markers
+				coordinates.forEach((point) => {
+					diff.push(Math.abs(point[0] - center[0]))
+				})
+				const index = diff.indexOf(Math.min(...diff)) // get the index of smallest diff
+				dragIndex = index
+
+				document.getElementById('marker').style.transform = `translateY(-9px)`
+			}
+
+			determineClosest()
+		})
+		.on('end', () => {
+			document.getElementById('marker').style.transform = `translateY(0)`
+			moveToCity(dragIndex)
+			swiper.slideTo(dragIndex, 750)
+		})
+
+	g.call(dragThis)
+	// const countriesGroup = d3.select('.countries')
+	// console.log(countriesGroup.on('click', () => console.log('first')))
 
 	document.getElementById('map-container').appendChild(svg.node())
 
-	// 	function moveToCity(index) {
-	// 		const city = cities[index]
-	// 		const [x, y] = projection(city.coords)
-	// 		const offsetX = 0 // Adjust if needed
-	// 		const offsetY = 0
-	//
-	// 		const currentTransform = d3.zoomTransform(svg.node())
-	//
-	// 		// Gray out all city markers
-	// 		d3.selectAll('.city-marker')
-	// 			.attr('fill', '#aaa') // Gray color for inactive markers
-	// 			.attr('r', 3) // Optional: Make them smaller
-	//
-	// 		// Highlight only the selected city marker
-	// 		d3.select(`.city-marker[data-index="${index}"]`)
-	// 			.attr('fill', '#e58c32') // Highlight color
-	// 			.attr('r', 5) // Optional: Make it slightly larger
-	//
-	// 		// Hide all labels, then show only the current city's label
-	// 		d3.selectAll('.city-label').style('opacity', 0)
-	// 		d3.select(`.city-label[data-index="${index}"]`).style('opacity', 1)
-	//
-	// 		const newX = width / 2 - x
-	// 		const newY = height / 2 - y
-	//
-	// 		svg
-	// 			.transition()
-	// 			.duration(750)
-	// 			.tween('move', () => {
-	// 				const interpolate = d3.interpolate(
-	// 					[currentTransform.x, currentTransform.y],
-	// 					[newX, newY],
-	// 				)
-	// 				return (t) => {
-	// 					zoom.transform(
-	// 						svg,
-	// 						d3.zoomIdentity
-	// 							.translate(...interpolate(t))
-	// 							.scale(currentTransform.k),
-	// 					)
-	// 				}
-	// 			})
-	//
-	// 		// Smoothly zoom and center the selected city
-	// 		// svg
-	// 		// 	.transition()
-	// 		// 	.duration(750)
-	// 		// 	.call(zoom.translateTo, width / 2 - 50, height / 2 - 50)
-	//
-	// 		// svg
-	// 		// 	.transition()
-	// 		// 	.duration(750)
-	// 		// 	.call(
-	// 		// 		zoom.transform,
-	// 		// 		d3.zoomIdentity
-	// 		// 			.scale(currentTransform.k)
-	// 		// 			.translate(
-	// 		// 				currentTransform.x +
-	// 		// 					(width / 2 -
-	// 		// 						x * currentTransform.k +
-	// 		// 						offsetX -
-	// 		// 						currentTransform.x),
-	// 		// 				currentTransform.y +
-	// 		// 					(height / 2 -
-	// 		// 						y * currentTransform.k +
-	// 		// 						offsetY -
-	// 		// 						currentTransform.y),
-	// 		// 			),
-	// 		// 	)
-	// 	}
-
 	function moveToCity(index) {
 		const city = cities[index]
+		if (!city) return
+
 		const [lon, lat] = city.coords.map(Number) // Ensure numeric values
 
 		// Calculate new rotation so that the city is at the center
 		const newRotation = [-lon, -lat + 5]
+		rotation = [-lon, -lat + 5]
 
 		d3.selectAll('.city-marker').attr('fill', '#c3c3c4') // Gray out all markers
 
@@ -427,7 +482,13 @@ async function worldMap() {
 						.attr('cy', (d) => projection(d.coords)[1]) // Update city positions
 				}
 			})
+		// projection.rotate(rotation) // Apply new rotation
+		// g.selectAll('path').attr('d', path)
+		// d3.selectAll('.city-marker')
+		// 	.attr('cx', (d) => projection(d.coords)[0])
+		// 	.attr('cy', (d) => projection(d.coords)[1])
 	}
+	// handleDrag()
 
 	var swiper = new Swiper('.mySwiper', {
 		slidesPerView: 4,
@@ -443,7 +504,6 @@ async function worldMap() {
 	})
 
 	swiper.on('slideChange', () => {
-		console.log('*** mySwiper.realIndex', swiper.activeIndex)
 		moveToCity(swiper.activeIndex)
 		currentCity = swiper.activeIndex
 	})

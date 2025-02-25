@@ -130,12 +130,14 @@ body {
 
 	.mySwiper {
 		position: relative;
+		min-height: 230px;
 
 		.swiper-wrapper {
+			min-height: 230px;
 			align-items: center;
 
 			.location-card {
-				height: 224px;
+				height: 200px;
 				// width: 426px;
 				background-size: cover;
 				background-repeat: no-repeat;
@@ -150,7 +152,7 @@ body {
 				}
 
 				&:is(.swiper-slide-active) {
-					// height: 256px;
+					height: 230px;
 					filter: grayscale(0);
 
 					svg {
