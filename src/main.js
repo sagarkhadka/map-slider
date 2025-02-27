@@ -1,7 +1,7 @@
 import * as d3 from 'd3'
 import { ArrowRight, ChevronLeft, ChevronRight, createIcons } from 'lucide'
 import Swiper from 'swiper'
-import { Navigation } from 'swiper/modules'
+import { Autoplay, Navigation } from 'swiper/modules'
 import 'swiper/css'
 import 'swiper/css/navigation'
 import * as topojson from 'topojson-client'
@@ -339,6 +339,7 @@ async function worldMap() {
 
 		cities.push(data)
 	})
+	console.log('locations\t', cities)
 
 	const cityGroup = g
 		.append('g')
@@ -408,8 +409,8 @@ async function worldMap() {
 		.on('drag', (e) => {
 			// this is center point of the map
 			const center = [400, 331.3648525862192]
-			console.log(startRotation)
-			console.log(e)
+			// console.log(startRotation)
+			// console.log(e)
 
 			rotation[0] += e.dx * 0.2
 			rotation[1] -= e.dy * 0.2
@@ -445,7 +446,9 @@ async function worldMap() {
 			determineClosest()
 		})
 		.on('end', () => {
-			document.getElementById('marker').style.transform = `translateY(0)`
+			setTimeout(() => {
+				document.getElementById('marker').style.transform = `translateY(0)`
+			}, 600)
 			moveToCity(dragIndex)
 			swiper.slideTo(dragIndex, 750)
 		})
@@ -491,19 +494,36 @@ async function worldMap() {
 	// handleDrag()
 
 	var swiper = new Swiper('.mySwiper', {
-		slidesPerView: 4,
+		// slidesPerView: 4,
 		centeredSlides: true,
 		spaceBetween: 30,
+		loop: false,
+		autoplay: {
+			delay: 5000,
+		},
+		rewind: true,
 		grabCursor: true,
 		freeMode: true,
 		navigation: {
 			nextEl: '.swiper-button-next',
 			prevEl: '.swiper-button-prev',
 		},
-		modules: [Navigation],
+		breakpoints: {
+			400: {
+				slidesPerView: 1,
+			},
+			640: {
+				slidesPerView: 2,
+			},
+			1024: {
+				slidesPerView: 4,
+			},
+		},
+		modules: [Navigation, Autoplay],
 	})
 
 	swiper.on('slideChange', () => {
+		// console.log('swiper change')
 		moveToCity(swiper.activeIndex)
 		currentCity = swiper.activeIndex
 	})
@@ -517,16 +537,6 @@ async function worldMap() {
 	})
 
 	moveToCity(0)
-
-	document.getElementById('next-btn').addEventListener('click', () => {
-		// currentCity = (currentCity + 1) % cities.length
-		moveToCity(currentCity)
-	})
-
-	document.getElementById('prev-btn').addEventListener('click', () => {
-		// currentCity = (currentCity - 1 + cities.length) % cities.length
-		moveToCity(currentCity)
-	})
 }
 
 document.addEventListener('DOMContentLoaded', () => {

@@ -1,17 +1,5 @@
 export const places = [
 	{
-		city: 'Chicago',
-		lat: 41.8781,
-		lng: -87.6298,
-		img: 'https://images.unsplash.com/photo-1485738422979-f5c462d49f74?q=80&w=2099&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-	},
-	{
-		city: 'New York',
-		lat: 40.7128,
-		lng: -74.006,
-		img: 'https://images.unsplash.com/photo-1530959106156-50f49c30932d?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-	},
-	{
 		city: 'Los Angeles',
 		lat: 34.0522,
 		lng: -118.2437,
@@ -40,6 +28,18 @@ export const places = [
 		lat: 43.085126,
 		lng: -89.5714063,
 		img: 'https://res.cloudinary.com/simpleview/image/upload/v1581970951/clients/madison/MTskyline_CC_74f307ac-1489-4411-a0f8-b248e882a8de.jpg',
+	},
+	{
+		city: 'Chicago',
+		lat: 41.8781,
+		lng: -87.6298,
+		img: 'https://images.unsplash.com/photo-1485738422979-f5c462d49f74?q=80&w=2099&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+	},
+	{
+		city: 'New York',
+		lat: 40.7128,
+		lng: -74.006,
+		img: 'https://images.unsplash.com/photo-1530959106156-50f49c30932d?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
 	},
 	{
 		city: 'Miami, FL',
