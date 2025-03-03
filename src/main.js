@@ -339,7 +339,6 @@ async function worldMap() {
 
 		cities.push(data)
 	})
-	console.log('locations\t', cities)
 
 	const cityGroup = g
 		.append('g')
@@ -355,7 +354,7 @@ async function worldMap() {
 		.attr('data-index', (d, i) => i) // Assign unique index
 		.attr('cx', (d) => projection(d.coords)[0])
 		.attr('cy', (d) => projection(d.coords)[1])
-		.attr('r', 4)
+		.attr('r', 2)
 		.attr('fill', '#e58c32')
 		.attr('stroke', '#fff')
 		.attr('stroke-width', 1)
@@ -421,23 +420,55 @@ async function worldMap() {
 				.attr('cx', (d) => projection(d.coords)[0])
 				.attr('cy', (d) => projection(d.coords)[1])
 
+			// 			const determineClosest = () => {
+			// 				const cityMarkers = document.querySelectorAll('.city-marker')
+			// 				let coordinates = [],
+			// 					diff = []
+			//
+			// 				// get the coordinates of the city markers
+			// 				cityMarkers.forEach((mark, index) => {
+			// 					const x = mark.getAttribute('cx')
+			// 					const y = mark.getAttribute('cy')
+			// 					coordinates.push([x, y])
+			// 				})
+			//
+			// 				// get the difference between the center and the city markers
+			// 				coordinates.forEach((point) => {
+			// 					diff.push(Math.abs(point[0] - center[0]))
+			// 				})
+			// 				console.log('coordinates\t', coordinates)
+			// 				console.log(diff)
+			//
+			// 				const index = diff.indexOf(Math.min(...diff)) // get the index of smallest diff
+			// 				dragIndex = index
+			//
+			// 				document.getElementById('marker').style.transform = `translateY(-9px)`
+			// 			}
+
 			const determineClosest = () => {
 				const cityMarkers = document.querySelectorAll('.city-marker')
 				let coordinates = [],
-					diff = []
+					distances = []
 
-				// get the coordinates of the city markers
-				cityMarkers.forEach((mark, index) => {
-					const x = mark.getAttribute('cx')
-					const y = mark.getAttribute('cy')
+				// Get the coordinates of the city markers
+				cityMarkers.forEach((mark) => {
+					const x = parseFloat(mark.getAttribute('cx'))
+					const y = parseFloat(mark.getAttribute('cy'))
 					coordinates.push([x, y])
 				})
 
-				// get the difference between the center and the city markers
+				// Compute Euclidean distance from center
+				// ? https://www.geeksforgeeks.org/euclidean-distance/
 				coordinates.forEach((point) => {
-					diff.push(Math.abs(point[0] - center[0]))
+					const distance = Math.sqrt(
+						Math.pow(point[0] - center[0], 2) +
+							Math.pow(point[1] - center[1], 2),
+					)
+					distances.push(distance)
 				})
-				const index = diff.indexOf(Math.min(...diff)) // get the index of smallest diff
+
+				// Find the index of the closest marker
+				const index = distances.indexOf(Math.min(...distances))
 				dragIndex = index
 
 				document.getElementById('marker').style.transform = `translateY(-9px)`
@@ -461,6 +492,9 @@ async function worldMap() {
 
 	function moveToCity(index) {
 		const city = cities[index]
+		console.log('index', index)
+		console.log('----------------------')
+		console.log('city', city)
 		if (!city) return
 
 		const [lon, lat] = city.coords.map(Number) // Ensure numeric values
@@ -469,9 +503,11 @@ async function worldMap() {
 		const newRotation = [-lon, -lat + 5]
 		rotation = [-lon, -lat + 5]
 
-		d3.selectAll('.city-marker').attr('fill', '#c3c3c4') // Gray out all markers
+		d3.selectAll('.city-marker').attr('fill', '#c3c3c4').attr('r', 2) // Gray out all markers
 
-		d3.select(`.city-marker[data-index="${index}"]`).attr('fill', '#e58c32') // Highlight the selected marker
+		d3.select(`.city-marker[data-index="${index}"]`)
+			.attr('fill', '#e58c32')
+			.attr('r', 4) // Highlight the selected marker
 
 		d3.transition()
 			.duration(750)
@@ -498,9 +534,9 @@ async function worldMap() {
 		centeredSlides: true,
 		spaceBetween: 30,
 		loop: false,
-		autoplay: {
-			delay: 5000,
-		},
+		// autoplay: {
+		// 	delay: 5000,
+		// },
 		rewind: true,
 		grabCursor: true,
 		freeMode: true,
