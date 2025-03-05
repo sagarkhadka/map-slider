@@ -381,7 +381,7 @@ async function worldMap() {
 		.attr('x', width / 2 - 20)
 		.attr('y', height / 2 - 120)
 		.attr('id', 'marker')
-		.attr('style', 'transition: all 200ms ease-in-out;')
+		.attr('style', 'transition: all 200ms ease-in-out; pointer-events: none;')
 
 	svg.call(zoom).call(zoom.transform, d3.zoomIdentity.scale(zoomLevel))
 	// svg.on('click', () => {
